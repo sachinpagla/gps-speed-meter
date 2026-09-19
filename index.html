@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+<meta name="theme-color" content="#071018">
+
+<title>GPS Speed Meter V3 PRO</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root{
+    --bg:#070c12;
+    --panel:#111a24;
+    --panel2:#17222e;
+    --text:#fff;
+    --muted:#8d9aa8;
+    --green:#00e894;
+    --blue:#39a9ff;
+    --red:#ff4d5e;
+    --border:#243240;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    transition:.25s;
+}
+
+body.light{
+    --bg:#eef2f6;
+    --panel:#fff;
+    --panel2:#e7edf3;
+    --text:#111;
+    --muted:#65717d;
+    --border:#ccd5de;
+}
+
+.app{
+    width:100%;
+    max-width:650px;
+    margin:auto;
+    padding:14px;
+}
+
+/* HEADER */
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+
+.brand{
+    font-size:22px;
+    font-weight:800;
+}
+
+.v3{
+    color:var(--green);
+    border:1px solid var(--green);
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:11px;
+}
+
+/* TOP BUTTONS */
+
+.topButtons{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin-bottom:12px;
+}
+
+.iconBtn{
+    background:var(--panel);
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:9px 12px;
+    font-size:16px;
+}
+
+/* SPEEDOMETER */
+
+.gauge{
+    width:min(94vw,430px);
+    height:min(94vw,430px);
+    margin:5px auto 10px;
+    border-radius:50%;
+    position:relative;
+
+    background:
+    radial-gradient(
+        circle,
+        var(--bg) 0 56%,
+        transparent 56%
+    );
+
+    border:13px solid #1b2836;
+
+    box-shadow:
+    0 0 0 4px #0e1720,
+    0 0 45px rgba(0,232,148,.18);
+
+    overflow:hidden;
+}
+
+/* ARC */
+
+.arc{
+    position:absolute;
+    inset:-13px;
+    border-radius:50%;
+
+    background:
+    conic-gradient(
+        from 220deg,
+        var(--green) 0deg,
+        var(--green) 100deg,
+        #ffc400 145deg,
+        var(--red) 190deg,
+        transparent 190deg 360deg
+    );
+
+    -webkit-mask:
+    radial-gradient(
+        farthest-side,
+        transparent calc(100% - 13px),
+        #000 calc(100% - 12px)
+    );
+
+    mask:
+    radial-gradient(
+        farthest-side,
+        transparent calc(100% - 13px),
+        #000 calc(100% - 12px)
+    );
+}
+
+/* TICKS */
+
+.ticks{
+    position:absolute;
+    inset:20px;
+    border-radius:50%;
+}
+
+.tick{
+    position:absolute;
+    left:50%;
+    top:0;
+    width:3px;
+    height:12px;
+    background:#8a98a6;
+    transform-origin:50% 175px;
+    border-radius:3px;
+}
+
+/* NEEDLE */
+
+.needle{
+    position:absolute;
+    width:5px;
+    height:145px;
+    background:var(--red);
+    left:50%;
+    top:50%;
+    transform-origin:50% 100%;
+    transform:
+        translate(-50%,-100%)
+        rotate(-130deg);
+    border-radius:5px;
+    transition:transform .35s ease-out;
+    box-shadow:0 0 10px rgba(255,77,94,.6);
+}
+
+.centerDot{
+    position:absolute;
+    width:22px;
+    height:22px;
+    background:var(--red);
+    border:5px solid var(--panel);
+    border-radius:50%;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+}
+
+/* DIGITAL */
+
+.digital{
+    position:absolute;
+    left:0;
+    right:0;
+    top:45%;
+    text-align:center;
+}
+
+.speed{
+    font-size:76px;
+    font-weight:800;
+    line-height:1;
+}
+
+.speedUnit{
+    margin-top:5px;
+    color:var(--muted);
+    font-size:18px;
+    font-weight:bold;
+}
+
+/* 0 - 160 */
+
+.gaugeMax{
+    position:absolute;
+    bottom:62px;
+    left:0;
+    right:0;
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+}
+
+/* UNIT */
+
+.units{
+    display:flex;
+    justify-content:center;
+    gap:7px;
+    margin-bottom:12px;
+}
+
+.unitBtn{
+    background:var(--panel);
+    color:var(--muted);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:8px 15px;
+}
+
+.unitBtn.active{
+    background:var(--green);
+    color:#00160d;
+    border-color:var(--green);
+    font-weight:bold;
+}
+
+/* WARNING */
+
+.warning{
+    display:none;
+    background:#44151b;
+    color:#ff9ca7;
+    border:1px solid var(--red);
+    padding:10px;
+    border-radius:10px;
+    margin-bottom:10px;
+    font-weight:bold;
+}
+
+/* CARDS */
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:9px;
+}
+
+.card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:13px;
+    padding:13px 7px;
+    text-align:center;
+}
+
+.label{
+    color:var(--muted);
+    font-size:11px;
+    margin-bottom:6px;
+}
+
+.value{
+    font-size:20px;
+    font-weight:800;
+}
+
+/* CONTROL */
+
+.controls{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin-top:10px;
+}
+
+.main{
+    padding:15px;
+    border:0;
+    border-radius:12px;
+    background:var(--green);
+    color:#00160d;
+    font-size:16px;
+    font-weight:800;
+}
+
+.reset{
+    padding:15px;
+    border-radius:12px;
+    background:var(--panel2);
+    color:var(--text);
+    border:1px solid var(--border);
+    font-size:16px;
+    font-weight:800;
+}
+
+/* EXTRA */
+
+.extra{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin-top:9px;
+}
+
+.extra button{
+    padding:12px;
+    border-radius:11px;
+    background:var(--panel);
+    color:var(--text);
+    border:1px solid var(--border);
+}
+
+.status{
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+    margin:12px 0 5px;
+}
+
+.footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:10px;
+    padding:10px;
+}
+
+@media(max-width:380px){
+
+    .speed{
+        font-size:62px;
+    }
+
+    .gauge{
+        width:88vw;
+        height:88vw;
+    }
+
+    .needle{
+        height:125px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="header">
+
+<div class="brand">
+🚗 GPS Speed Meter
+</div>
+
+<div class="v3">
+V3 PRO
+</div>
+
+</div>
+
+
+<div class="topButtons">
+
+<button class="iconBtn"
+onclick="toggleTheme()">
+🌙
+</button>
+
+<button class="iconBtn"
+onclick="fullscreen()">
+⛶
+</button>
+
+<button class="iconBtn"
+onclick="openMap()">
+📍
+</button>
+
+</div>
+
+
+<!-- GAUGE -->
+
+<div class="gauge">
+
+<div class="arc"></div>
+
+<div class="ticks" id="ticks"></div>
+
+<div class="needle"
+id="needle"></div>
+
+<div class="centerDot"></div>
+
+<div class="digital">
+
+<div class="speed"
+id="speed">
+0.0
+</div>
+
+<div class="speedUnit"
+id="speedUnit">
+KM/H
+</div>
+
+</div>
+
+<div class="gaugeMax">
+MAX 160 KM/H
+</div>
+
+</div>
+
+
+<!-- UNIT -->
+
+<div class="units">
+
+<button class="unitBtn active"
+id="kmhBtn"
+onclick="setUnit('kmh')">
+KM/H
+</button>
+
+<button class="unitBtn"
+id="mphBtn"
+onclick="setUnit('mph')">
+MPH
+</button>
+
+<button class="unitBtn"
+id="msBtn"
+onclick="setUnit('ms')">
+M/S
+</button>
+
+</div>
+
+
+<div class="warning"
+id="warning">
+⚠️ SPEED LIMIT EXCEEDED
+</div>
+
+
+<!-- DATA -->
+
+<div class="grid">
+
+<div class="card">
+
+<div class="label">
+MAX SPEED
+</div>
+
+<div class="value"
+id="maxSpeed">
+0.0 km/h
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="label">
+AVG SPEED
+</div>
+
+<div class="value"
+id="avgSpeed">
+0.0 km/h
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="label">
+DISTANCE
+</div>
+
+<div class="value"
+id="distance">
+0.00 km
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="label">
+TRIP TIME
+</div>
+
+<div class="value"
+id="tripTime">
+00:00:00
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="label">
+GPS ACCURACY
+</div>
+
+<div class="value"
+id="accuracy">
+-- m
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="label">
+HEADING
+</div>
+
+<div class="value"
+id="heading">
+--°
+</div>
+
+</div>
+
+</div>
+
+
+<!-- CONTROLS -->
+
+<div class="controls">
+
+<button class="main"
+id="startBtn"
+onclick="toggleGPS()">
+START GPS
+</button>
+
+<button class="reset"
+onclick="resetTrip()">
+RESET
+</button>
+
+</div>
+
+
+<div class="extra">
+
+<button onclick="setLimit()">
+⚠️ Speed Limit
+</button>
+
+<button onclick="saveTrip()">
+💾 Save Trip
+</button>
+
+</div>
+
+
+<div class="status"
+id="status">
+GPS stopped
+</div>
+
+
+<div class="footer">
+GPS Speed Meter V3 PRO
+</div>
+
+</div>
+
+
+<script>
+
+/* -------------------------
+   VARIABLES
+------------------------- */
+
+let watchID=null;
+
+let running=false;
+
+let currentSpeed=0;
+
+let maxSpeed=0;
+
+let totalDistance=0;
+
+let lastPosition=null;
+
+let samples=[];
+
+let startTime=null;
+
+let selectedUnit="kmh";
+
+let speedLimit=80;
+
+let latitude=null;
+
+let longitude=null;
+
+
+/* -------------------------
+   GAUGE TICKS
+------------------------- */
+
+const ticks=document.getElementById("ticks");
+
+for(let i=0;i<=16;i++){
+
+    const tick=document.createElement("div");
+
+    tick.className="tick";
+
+    const angle=-130+(i*16.25);
+
+    tick.style.transform=
+        "translateX(-50%) rotate("+angle+"deg)";
+
+    ticks.appendChild(tick);
+
+}
+
+
+/* -------------------------
+   DISTANCE
+------------------------- */
+
+function distanceBetween(
+lat1,lon1,lat2,lon2
+){
+
+const R=6371;
+
+const dLat=
+(lat2-lat1)*Math.PI/180;
+
+const dLon=
+(lon2-lon1)*Math.PI/180;
+
+const a=
+Math.sin(dLat/2)**2+
+
+Math.cos(lat1*Math.PI/180)*
+Math.cos(lat2*Math.PI/180)*
+Math.sin(dLon/2)**2;
+
+const c=
+2*Math.atan2(
+Math.sqrt(a),
+Math.sqrt(1-a)
+);
+
+return R*c;
+
+}
+
+
+/* -------------------------
+   TIME
+------------------------- */
+
+function formatTime(sec){
+
+sec=Math.floor(sec);
+
+const h=
+Math.floor(sec/3600);
+
+const m=
+Math.floor((sec%3600)/60);
+
+const s=
+sec%60;
+
+return String(h).padStart(2,"0")
++":"
++String(m).padStart(2,"0")
++":"
++String(s).padStart(2,"0");
+
+}
+
+
+/* -------------------------
+   UNIT
+------------------------- */
+
+function setUnit(unit){
+
+selectedUnit=unit;
+
+document.querySelectorAll(".unitBtn")
+.forEach(x=>x.classList.remove("active"));
+
+document
+.getElementById(unit+"Btn")
+.classList.add("active");
+
+updateDisplay();
+
+}
+
+
+/* -------------------------
+   DISPLAY
+------------------------- */
+
+function updateDisplay(){
+
+let value=currentSpeed;
+
+let text="KM/H";
+
+if(selectedUnit==="mph"){
+
+value=currentSpeed*0.621371;
+
+text="MPH";
+
+}
+
+if(selectedUnit==="ms"){
+
+value=currentSpeed/3.6;
+
+text="M/S";
+
+}
+
+document.getElementById("speed")
+.innerText=
+value.toFixed(1);
+
+document.getElementById("speedUnit")
+.innerText=text;
+
+
+/* NEEDLE */
+
+let gaugeSpeed=
+Math.min(currentSpeed,160);
+
+let angle=
+-130+(gaugeSpeed/160)*260;
+
+document.getElementById("needle")
+.style.transform=
+"translate(-50%,-100%) rotate("+angle+"deg)";
+
+
+/* WARNING */
+
+if(currentSpeed>=speedLimit){
+
+document.getElementById("warning")
+.style.display="block";
+
+}else{
+
+document.getElementById("warning")
+.style.display="none";
+
+}
+
+}
+
+
+/* -------------------------
+   GPS START
+------------------------- */
+
+function toggleGPS(){
+
+if(running){
+
+stopGPS();
+
+}else{
+
+startGPS();
+
+}
+
+}
+
+
+function startGPS(){
+
+if(!navigator.geolocation){
+
+document.getElementById("status")
+.innerText=
+"GPS not supported";
+
+return;
+
+}
+
+running=true;
+
+startTime=Date.now();
+
+document.getElementById("startBtn")
+.innerText="STOP GPS";
+
+document.getElementById("status")
+.innerText=
+"Getting GPS location...";
+
+watchID=
+navigator.geolocation.watchPosition(
+
+positionUpdate,
+
+gpsError,
+
+{
+
+enableHighAccuracy:true,
+
+maximumAge:1000,
+
+timeout:15000
+
+}
+
+);
+
+timer();
+
+}
+
+
+/* -------------------------
+   GPS UPDATE
+------------------------- */
+
+function positionUpdate(position){
+
+const c=position.coords;
+
+latitude=c.latitude;
+
+longitude=c.longitude;
+
+
+/* SPEED */
+
+let speed=c.speed;
+
+if(speed===null || isNaN(speed)){
+
+speed=0;
+
+}else{
+
+speed=speed*3.6;
+
+}
+
+currentSpeed=speed;
+
+
+/* MAX */
+
+if(speed>maxSpeed){
+
+maxSpeed=speed;
+
+}
+
+
+/* AVG */
+
+if(speed>1){
+
+samples.push(speed);
+
+}
+
+
+/* DISTANCE */
+
+if(lastPosition){
+
+const d=
+distanceBetween(
+
+lastPosition.lat,
+lastPosition.lon,
+
+c.latitude,
+c.longitude
+
+);
+
+/*
+Ignore GPS jumps
+larger than 200 meters
+between readings.
+*/
+
+if(d<0.2){
+
+totalDistance+=d;
+
+}
+
+}
+
+lastPosition={
+
+lat:c.latitude,
+lon:c.longitude
+
+};
+
+
+/* UI */
+
+document.getElementById("accuracy")
+.innerText=
+Math.round(c.accuracy)+" m";
+
+
+if(c.heading!==null &&
+!isNaN(c.heading)){
+
+document.getElementById("heading")
+.innerText=
+Math.round(c.heading)+"°";
+
+}
+
+
+updateCards();
+
+updateDisplay();
+
+document.getElementById("status")
+.innerText=
+"🟢 GPS tracking active";
+
+}
+
+
+/* -------------------------
+   CARDS
+------------------------- */
+
+function updateCards(){
+
+document.getElementById("maxSpeed")
+.innerText=
+maxSpeed.toFixed(1)+" km/h";
+
+
+let avg=0;
+
+if(samples.length){
+
+avg=
+samples.reduce(
+(a,b)=>a+b,0
+)/samples.length;
+
+}
+
+document.getElementById("avgSpeed")
+.innerText=
+avg.toFixed(1)+" km/h";
+
+
+document.getElementById("distance")
+.innerText=
+totalDistance.toFixed(2)+" km";
+
+}
+
+
+/* -------------------------
+   TIMER
+------------------------- */
+
+function timer(){
+
+if(!running)return;
+
+const seconds=
+(startTime)?
+(Date.now()-startTime)/1000:
+0;
+
+document.getElementById("tripTime")
+.innerText=
+formatTime(seconds);
+
+setTimeout(timer,1000);
+
+}
+
+
+/* -------------------------
+   STOP
+------------------------- */
+
+function stopGPS(){
+
+if(watchID!==null){
+
+navigator.geolocation
+.clearWatch(watchID);
+
+watchID=null;
+
+}
+
+running=false;
+
+document.getElementById("startBtn")
+.innerText=
+"START GPS";
+
+document.getElementById("status")
+.innerText=
+"GPS stopped";
+
+}
+
+
+/* -------------------------
+   RESET
+------------------------- */
+
+function resetTrip(){
+
+stopGPS();
+
+currentSpeed=0;
+
+maxSpeed=0;
+
+totalDistance=0;
+
+lastPosition=null;
+
+samples=[];
+
+startTime=null;
+
+latitude=null;
+
+longitude=null;
+
+document.getElementById("speed")
+.innerText="0.0";
+
+document.getElementById("maxSpeed")
+.innerText="0.0 km/h";
+
+document.getElementById("avgSpeed")
+.innerText="0.0 km/h";
+
+document.getElementById("distance")
+.innerText="0.00 km";
+
+document.getElementById("tripTime")
+.innerText="00:00:00";
+
+document.getElementById("accuracy")
+.innerText="-- m";
+
+document.getElementById("heading")
+.innerText="--°";
+
+updateDisplay();
+
+}
+
+
+/* -------------------------
+   SPEED LIMIT
+------------------------- */
+
+function setLimit(){
+
+const value=
+prompt(
+"Enter speed limit in KM/H:",
+speedLimit
+);
+
+if(value===null)return;
+
+const n=parseFloat(value);
+
+if(!isNaN(n) && n>0){
+
+speedLimit=n;
+
+document.getElementById("status")
+.innerText=
+"Speed limit: "+n+" km/h";
+
+updateDisplay();
+
+}
+
+}
+
+
+/* -------------------------
+   MAP
+------------------------- */
+
+function openMap(){
+
+if(latitude===null ||
+longitude===null){
+
+alert(
+"Start GPS first to get your location."
+);
+
+return;
+
+}
+
+const url=
+"https://www.google.com/maps?q="
++latitude+","+longitude;
+
+window.open(url,"_blank");
+
+}
+
+
+/* -------------------------
+   SAVE TRIP
+------------------------- */
+
+function saveTrip(){
+
+const trip={
+
+date:new Date().toLocaleString(),
+
+maxSpeed:maxSpeed.toFixed(1),
+
+average:samples.length?
+(
+samples.reduce((a,b)=>a+b,0)
+/
+samples.length
+).toFixed(1):"0",
+
+distance:totalDistance.toFixed(2)
+
+};
+
+localStorage.setItem(
+"gpsLastTrip",
+JSON.stringify(trip)
+);
+
+document.getElementById("status")
+.innerText=
+"Trip saved on this device";
+
+}
+
+
+/* -------------------------
+   FULLSCREEN
+------------------------- */
+
+function fullscreen(){
+
+if(!document.fullscreenElement){
+
+document.documentElement
+.requestFullscreen()
+.catch(()=>{});
+
+}else{
+
+document.exitFullscreen();
+
+}
+
+}
+
+
+/* -------------------------
+   THEME
+------------------------- */
+
+function toggleTheme(){
+
+document.body.classList.toggle("light");
+
+}
+
+
+/* -------------------------
+   GPS ERROR
+------------------------- */
+
+function gpsError(error){
+
+let msg="GPS error";
+
+if(error.code===1)
+msg="Location permission denied";
+
+if(error.code===2)
+msg="GPS unavailable";
+
+if(error.code===3)
+msg="GPS timeout";
+
+document.getElementById("status")
+.innerText=msg;
+
+}
+
+
+/* INITIAL */
+
+updateDisplay();
+
+</script>
+
+</body>
+  </html
