@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPS Speed Meter</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #0b0f14;
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.app {
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 25px;
+}
+
+.speed-box {
+    width: 280px;
+    height: 280px;
+    margin: auto;
+    border: 12px solid #222a35;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 30px rgba(0,255,150,.15);
+}
+
+.speed {
+    font-size: 72px;
+    font-weight: bold;
+}
+
+.unit {
+    font-size: 22px;
+    color: #aaa;
+}
+
+.info {
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.card {
+    background: #151c25;
+    border-radius: 14px;
+    padding: 18px 10px;
+}
+
+.label {
+    color: #999;
+    font-size: 14px;
+}
+
+.value {
+    margin-top: 7px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+button {
+    width: 100%;
+    margin-top: 25px;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    background: #00d084;
+    color: #001b11;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+button:active {
+    transform: scale(.98);
+}
+
+.status {
+    margin-top: 15px;
+    color: #aaa;
+    font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <h1>🚗 GPS Speed Meter</h1>
+
+    <div class="speed-box">
+        <div class="speed" id="speed">0</div>
+        <div class="unit">KM/H</div>
+    </div>
+
+    <div class="info">
+
+        <div class="card">
+            <div class="label">Maximum</div>
+            <div class="value" id="maxSpeed">0 km/h</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Accuracy</div>
+            <div class="value" id="accuracy">-- m</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Latitude</div>
+            <div class="value" id="lat">--</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Longitude</div>
+            <div class="value" id="lon">--</div>
+        </div>
+
+    </div>
+
+    <button onclick="startGPS()">START GPS</button>
+
+    <div class="status" id="status">
+        GPS stopped
+    </div>
+
+</div>
+
+<script>
+
+let watchID = null;
+let maxSpeed = 0;
+
+function startGPS() {
+
+    if (!navigator.geolocation) {
+        document.getElementById("status").innerText =
+            "GPS is not supported on this device.";
+        return;
+    }
+
+    document.getElementById("status").innerText =
+        "Getting GPS location...";
+
+    watchID = navigator.geolocation.watchPosition(
+
+        function(position) {
+
+            let coords = position.coords;
+
+            let speed = coords.speed;
+
+            if (speed === null || isNaN(speed)) {
+                speed = 0;
+            }
+
+            // m/s to km/h
+            speed = speed * 3.6;
+
+            speed = Math.round(speed * 10) / 10;
+
+            if (speed > maxSpeed) {
+                maxSpeed = speed;
+            }
+
+            document.getElementById("speed").innerText = speed;
+            document.getElementById("maxSpeed").innerText =
+                maxSpeed + " km/h";
+
+            document.getElementById("accuracy").innerText =
+                Math.round(coords.accuracy) + " m";
+
+            document.getElementById("lat").innerText =
+                coords.latitude.toFixed(5);
+
+            document.getElementById("lon").innerText =
+                coords.longitude.toFixed(5);
+
+            document.getElementById("status").innerText =
+                "GPS is running";
+
+        },
+
+        function(error) {
+
+            let message = "GPS error";
+
+            if (error.code === 1)
+                message = "Location permission denied";
+
+            if (error.code === 2)
+                message = "GPS position unavailable";
+
+            if (error.code === 3)
+                message = "GPS request timed out";
+
+            document.getElementById("status").innerText = message;
+
+        },
+
+        {
+            enableHighAccuracy: true,
+            maximumAge: 1000,
+            timeout: 10000
+        }
+    );
+}
+
+</script>
+
+</body>
+</html>
