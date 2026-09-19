@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 
 <meta name="viewport"
 content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 
-<meta name="theme-color" content="#071018">
+<meta name="theme-color" content="#070c12">
 
-<title>GPS Speed Meter V3 PRO</title>
+<title>GPS Speed Meter V3.1 PRO</title>
 
 <style>
 
@@ -22,12 +23,12 @@ content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
     --bg:#070c12;
     --panel:#111a24;
     --panel2:#17222e;
-    --text:#fff;
+    --text:#ffffff;
     --muted:#8d9aa8;
     --green:#00e894;
-    --blue:#39a9ff;
-    --red:#ff4d5e;
-    --border:#243240;
+    --red:#ff4058;
+    --yellow:#ffc400;
+    --border:#263544;
 }
 
 body{
@@ -35,16 +36,20 @@ body{
     background:var(--bg);
     color:var(--text);
     min-height:100vh;
-    transition:.25s;
 }
 
 body.light{
-    --bg:#eef2f6;
-    --panel:#fff;
-    --panel2:#e7edf3;
-    --text:#111;
+    --bg:#edf2f6;
+    --panel:#ffffff;
+    --panel2:#e3eaf0;
+    --text:#111111;
     --muted:#65717d;
-    --border:#ccd5de;
+    --border:#cbd5df;
+}
+
+button{
+    font-family:inherit;
+    cursor:pointer;
 }
 
 .app{
@@ -68,7 +73,7 @@ body.light{
     font-weight:800;
 }
 
-.v3{
+.version{
     color:var(--green);
     border:1px solid var(--green);
     padding:5px 9px;
@@ -78,126 +83,128 @@ body.light{
 
 /* TOP BUTTONS */
 
-.topButtons{
+.top-buttons{
     display:flex;
     justify-content:center;
     gap:8px;
-    margin-bottom:12px;
+    margin-bottom:10px;
 }
 
-.iconBtn{
+.icon-btn{
+    width:52px;
+    height:42px;
     background:var(--panel);
     color:var(--text);
     border:1px solid var(--border);
-    border-radius:10px;
-    padding:9px 12px;
-    font-size:16px;
+    border-radius:11px;
+    font-size:19px;
 }
 
-/* SPEEDOMETER */
+/* GAUGE */
 
 .gauge{
     width:min(94vw,430px);
-    height:min(94vw,430px);
+    aspect-ratio:1/1;
     margin:5px auto 10px;
-    border-radius:50%;
     position:relative;
+}
+
+.gauge-bg{
+    position:absolute;
+    inset:0;
+    border-radius:50%;
 
     background:
-    radial-gradient(
-        circle,
-        var(--bg) 0 56%,
-        transparent 56%
-    );
+        radial-gradient(
+            circle,
+            var(--bg) 0 56%,
+            transparent 56%
+        );
 
     border:13px solid #1b2836;
 
     box-shadow:
-    0 0 0 4px #0e1720,
-    0 0 45px rgba(0,232,148,.18);
-
-    overflow:hidden;
+        0 0 0 4px #0d151e,
+        0 0 45px rgba(0,232,148,.18);
 }
 
-/* ARC */
+/* SVG */
 
-.arc{
+.gauge-svg{
     position:absolute;
-    inset:-13px;
-    border-radius:50%;
+    inset:0;
+    width:100%;
+    height:100%;
+}
 
-    background:
-    conic-gradient(
-        from 220deg,
-        var(--green) 0deg,
-        var(--green) 100deg,
-        #ffc400 145deg,
-        var(--red) 190deg,
-        transparent 190deg 360deg
-    );
+.arc-green{
+    fill:none;
+    stroke:#00e894;
+    stroke-width:9;
+    stroke-linecap:round;
+}
 
-    -webkit-mask:
-    radial-gradient(
-        farthest-side,
-        transparent calc(100% - 13px),
-        #000 calc(100% - 12px)
-    );
+.arc-yellow{
+    fill:none;
+    stroke:#ffc400;
+    stroke-width:9;
+    stroke-linecap:round;
+}
 
-    mask:
-    radial-gradient(
-        farthest-side,
-        transparent calc(100% - 13px),
-        #000 calc(100% - 12px)
-    );
+.arc-red{
+    fill:none;
+    stroke:#ff4058;
+    stroke-width:9;
+    stroke-linecap:round;
 }
 
 /* TICKS */
 
-.ticks{
-    position:absolute;
-    inset:20px;
-    border-radius:50%;
+.tick{
+    stroke:#82909e;
+    stroke-width:3;
+    stroke-linecap:round;
 }
 
-.tick{
-    position:absolute;
-    left:50%;
-    top:0;
-    width:3px;
-    height:12px;
-    background:#8a98a6;
-    transform-origin:50% 175px;
-    border-radius:3px;
+.tick.major{
+    stroke:#d0d8df;
+    stroke-width:5;
+}
+
+/* NUMBERS */
+
+.gauge-number{
+    fill:#8996a4;
+    font-size:13px;
+    font-weight:bold;
+    text-anchor:middle;
 }
 
 /* NEEDLE */
 
 .needle{
-    position:absolute;
-    width:5px;
-    height:145px;
-    background:var(--red);
-    left:50%;
-    top:50%;
-    transform-origin:50% 100%;
-    transform:
-        translate(-50%,-100%)
-        rotate(-130deg);
-    border-radius:5px;
-    transition:transform .35s ease-out;
-    box-shadow:0 0 10px rgba(255,77,94,.6);
+    stroke:#ff4058;
+    stroke-width:6;
+    stroke-linecap:round;
+
+    filter:
+        drop-shadow(
+            0 0 6px rgba(255,64,88,.9)
+        );
+
+    transition:
+        transform .25s ease-out;
 }
 
-.centerDot{
-    position:absolute;
-    width:22px;
-    height:22px;
-    background:var(--red);
-    border:5px solid var(--panel);
-    border-radius:50%;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
+.needle-center{
+    fill:#ff4058;
+    stroke:#111a24;
+    stroke-width:6;
+
+    filter:
+        drop-shadow(
+            0 0 8px rgba(255,64,88,.8)
+        );
 }
 
 /* DIGITAL */
@@ -206,36 +213,36 @@ body.light{
     position:absolute;
     left:0;
     right:0;
-    top:45%;
+    top:43%;
     text-align:center;
+    pointer-events:none;
 }
 
 .speed{
-    font-size:76px;
-    font-weight:800;
+    font-size:clamp(60px,17vw,82px);
     line-height:1;
+    font-weight:800;
+    letter-spacing:-3px;
 }
 
-.speedUnit{
-    margin-top:5px;
+.speed-unit{
+    margin-top:7px;
     color:var(--muted);
     font-size:18px;
     font-weight:bold;
 }
 
-/* 0 - 160 */
-
-.gaugeMax{
+.gauge-max{
     position:absolute;
-    bottom:62px;
     left:0;
     right:0;
+    bottom:18%;
     text-align:center;
     color:var(--muted);
     font-size:12px;
 }
 
-/* UNIT */
+/* UNIT BUTTONS */
 
 .units{
     display:flex;
@@ -244,17 +251,17 @@ body.light{
     margin-bottom:12px;
 }
 
-.unitBtn{
+.unit-btn{
+    padding:8px 16px;
+    border-radius:20px;
+    border:1px solid var(--border);
     background:var(--panel);
     color:var(--muted);
-    border:1px solid var(--border);
-    border-radius:18px;
-    padding:8px 15px;
 }
 
-.unitBtn.active{
+.unit-btn.active{
     background:var(--green);
-    color:#00160d;
+    color:#00150d;
     border-color:var(--green);
     font-weight:bold;
 }
@@ -263,7 +270,8 @@ body.light{
 
 .warning{
     display:none;
-    background:#44151b;
+    text-align:center;
+    background:#45151d;
     color:#ff9ca7;
     border:1px solid var(--red);
     padding:10px;
@@ -276,15 +284,15 @@ body.light{
 
 .grid{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:1fr 1fr;
     gap:9px;
 }
 
 .card{
     background:var(--panel);
     border:1px solid var(--border);
-    border-radius:13px;
-    padding:13px 7px;
+    border-radius:14px;
+    padding:14px 7px;
     text-align:center;
 }
 
@@ -299,7 +307,7 @@ body.light{
     font-weight:800;
 }
 
-/* CONTROL */
+/* CONTROLS */
 
 .controls{
     display:grid;
@@ -308,17 +316,17 @@ body.light{
     margin-top:10px;
 }
 
-.main{
+.main-btn{
     padding:15px;
     border:0;
     border-radius:12px;
     background:var(--green);
-    color:#00160d;
+    color:#00150d;
     font-size:16px;
     font-weight:800;
 }
 
-.reset{
+.reset-btn{
     padding:15px;
     border-radius:12px;
     background:var(--panel2);
@@ -337,12 +345,13 @@ body.light{
     margin-top:9px;
 }
 
-.extra button{
+.extra-btn{
     padding:12px;
     border-radius:11px;
     background:var(--panel);
     color:var(--text);
     border:1px solid var(--border);
+    font-weight:bold;
 }
 
 .status{
@@ -359,19 +368,24 @@ body.light{
     padding:10px;
 }
 
+/* MOBILE */
+
 @media(max-width:380px){
 
-    .speed{
-        font-size:62px;
+    .app{
+        padding:10px;
     }
 
-    .gauge{
-        width:88vw;
-        height:88vw;
+    .brand{
+        font-size:19px;
     }
 
-    .needle{
-        height:125px;
+    .card{
+        padding:12px 5px;
+    }
+
+    .value{
+        font-size:18px;
     }
 
 }
@@ -379,904 +393,940 @@ body.light{
 </style>
 </head>
 
+
 <body>
 
 <div class="app">
 
-<div class="header">
+    <!-- HEADER -->
 
-<div class="brand">
-🚗 GPS Speed Meter
-</div>
+    <div class="header">
 
-<div class="v3">
-V3 PRO
-</div>
+        <div class="brand">
+            🚗 GPS Speed Meter
+        </div>
 
-</div>
+        <div class="version">
+            V3.1 PRO
+        </div>
 
+    </div>
 
-<div class="topButtons">
 
-<button class="iconBtn"
-onclick="toggleTheme()">
-🌙
-</button>
+    <!-- TOP BUTTONS -->
 
-<button class="iconBtn"
-onclick="fullscreen()">
-⛶
-</button>
+    <div class="top-buttons">
 
-<button class="iconBtn"
-onclick="openMap()">
-📍
-</button>
+        <button
+            class="icon-btn"
+            onclick="toggleTheme()">
+            🌙
+        </button>
 
-</div>
+        <button
+            class="icon-btn"
+            onclick="toggleFullscreen()">
+            ⛶
+        </button>
 
+        <button
+            class="icon-btn"
+            onclick="openMap()">
+            📍
+        </button>
 
-<!-- GAUGE -->
+    </div>
 
-<div class="gauge">
 
-<div class="arc"></div>
+    <!-- GAUGE -->
 
-<div class="ticks" id="ticks"></div>
+    <div class="gauge">
 
-<div class="needle"
-id="needle"></div>
+        <div class="gauge-bg"></div>
 
-<div class="centerDot"></div>
+        <svg
+            class="gauge-svg"
+            viewBox="0 0 400 400">
 
-<div class="digital">
+            <!-- GREEN ARC -->
 
-<div class="speed"
-id="speed">
-0.0
-</div>
+            <path
+                class="arc-green"
+                d="M 74 300
+                   A 155 155 0 0 1 112 82"/>
 
-<div class="speedUnit"
-id="speedUnit">
-KM/H
-</div>
+            <!-- YELLOW ARC -->
 
-</div>
+            <path
+                class="arc-yellow"
+                d="M 112 82
+                   A 155 155 0 0 1 288 82"/>
 
-<div class="gaugeMax">
-MAX 160 KM/H
-</div>
+            <!-- RED ARC -->
 
-</div>
+            <path
+                class="arc-red"
+                d="M 288 82
+                   A 155 155 0 0 1 326 300"/>
 
 
-<!-- UNIT -->
+            <!-- TICKS -->
 
-<div class="units">
+            <g id="ticks"></g>
 
-<button class="unitBtn active"
-id="kmhBtn"
-onclick="setUnit('kmh')">
-KM/H
-</button>
 
-<button class="unitBtn"
-id="mphBtn"
-onclick="setUnit('mph')">
-MPH
-</button>
+            <!-- NUMBERS -->
 
-<button class="unitBtn"
-id="msBtn"
-onclick="setUnit('ms')">
-M/S
-</button>
+            <text
+                class="gauge-number"
+                x="72"
+                y="322">
+                0
+            </text>
 
-</div>
+            <text
+                class="gauge-number"
+                x="110"
+                y="83">
+                40
+            </text>
 
+            <text
+                class="gauge-number"
+                x="200"
+                y="57">
+                80
+            </text>
 
-<div class="warning"
-id="warning">
-⚠️ SPEED LIMIT EXCEEDED
-</div>
+            <text
+                class="gauge-number"
+                x="290"
+                y="83">
+                120
+            </text>
 
+            <text
+                class="gauge-number"
+                x="328"
+                y="322">
+                160
+            </text>
 
-<!-- DATA -->
 
-<div class="grid">
+            <!-- NEEDLE -->
 
-<div class="card">
+            <line
+                id="needle"
+                class="needle"
+                x1="200"
+                y1="200"
+                x2="200"
+                y2="65"
+                transform="rotate(-130 200 200)">
+            </line>
 
-<div class="label">
-MAX SPEED
-</div>
 
-<div class="value"
-id="maxSpeed">
-0.0 km/h
-</div>
+            <!-- CENTER -->
 
-</div>
+            <circle
+                class="needle-center"
+                cx="200"
+                cy="200"
+                r="12">
+            </circle>
 
+        </svg>
 
-<div class="card">
 
-<div class="label">
-AVG SPEED
-</div>
+        <!-- DIGITAL -->
 
-<div class="value"
-id="avgSpeed">
-0.0 km/h
-</div>
+        <div class="digital">
 
-</div>
+            <div
+                class="speed"
+                id="speed">
+                0.0
+            </div>
 
+            <div
+                class="speed-unit"
+                id="speedUnit">
+                KM/H
+            </div>
 
-<div class="card">
+        </div>
 
-<div class="label">
-DISTANCE
-</div>
 
-<div class="value"
-id="distance">
-0.00 km
-</div>
+        <div class="gauge-max">
+            MAX 160 KM/H
+        </div>
 
-</div>
+    </div>
 
 
-<div class="card">
+    <!-- UNITS -->
 
-<div class="label">
-TRIP TIME
-</div>
+    <div class="units">
 
-<div class="value"
-id="tripTime">
-00:00:00
-</div>
+        <button
+            class="unit-btn active"
+            id="kmhBtn"
+            onclick="setUnit('kmh')">
+            KM/H
+        </button>
 
-</div>
+        <button
+            class="unit-btn"
+            id="mphBtn"
+            onclick="setUnit('mph')">
+            MPH
+        </button>
 
+        <button
+            class="unit-btn"
+            id="msBtn"
+            onclick="setUnit('ms')">
+            M/S
+        </button>
 
-<div class="card">
+    </div>
 
-<div class="label">
-GPS ACCURACY
-</div>
 
-<div class="value"
-id="accuracy">
--- m
-</div>
+    <!-- WARNING -->
 
-</div>
+    <div
+        class="warning"
+        id="warning">
 
+        ⚠️ SPEED LIMIT EXCEEDED
 
-<div class="card">
+    </div>
 
-<div class="label">
-HEADING
-</div>
 
-<div class="value"
-id="heading">
---°
-</div>
+    <!-- DATA -->
 
-</div>
+    <div class="grid">
 
-</div>
+        <div class="card">
 
+            <div class="label">
+                MAX SPEED
+            </div>
 
-<!-- CONTROLS -->
+            <div
+                class="value"
+                id="maxSpeed">
+                0.0 km/h
+            </div>
 
-<div class="controls">
+        </div>
 
-<button class="main"
-id="startBtn"
-onclick="toggleGPS()">
-START GPS
-</button>
 
-<button class="reset"
-onclick="resetTrip()">
-RESET
-</button>
+        <div class="card">
 
-</div>
+            <div class="label">
+                AVG SPEED
+            </div>
 
+            <div
+                class="value"
+                id="avgSpeed">
+                0.0 km/h
+            </div>
 
-<div class="extra">
+        </div>
 
-<button onclick="setLimit()">
-⚠️ Speed Limit
-</button>
 
-<button onclick="saveTrip()">
-💾 Save Trip
-</button>
+        <div class="card">
 
-</div>
+            <div class="label">
+                DISTANCE
+            </div>
 
+            <div
+                class="value"
+                id="distance">
+                0.00 km
+            </div>
 
-<div class="status"
-id="status">
-GPS stopped
-</div>
+        </div>
 
 
-<div class="footer">
-GPS Speed Meter V3 PRO
-</div>
+        <div class="card">
+
+            <div class="label">
+                TRIP TIME
+            </div>
+
+            <div
+                class="value"
+                id="tripTime">
+                00:00:00
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="label">
+                GPS ACCURACY
+            </div>
+
+            <div
+                class="value"
+                id="accuracy">
+                -- m
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="label">
+                HEADING
+            </div>
+
+            <div
+                class="value"
+                id="heading">
+                --°
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CONTROLS -->
+
+    <div class="controls">
+
+        <button
+            class="main-btn"
+            id="startBtn"
+            onclick="toggleGPS()">
+            START GPS
+        </button>
+
+        <button
+            class="reset-btn"
+            onclick="resetTrip()">
+            RESET
+        </button>
+
+    </div>
+
+
+    <!-- EXTRA -->
+
+    <div class="extra">
+
+        <button
+            class="extra-btn"
+            onclick="setSpeedLimit()">
+            ⚠️ Speed Limit
+        </button>
+
+        <button
+            class="extra-btn"
+            onclick="saveTrip()">
+            💾 Save Trip
+        </button>
+
+    </div>
+
+
+    <!-- STATUS -->
+
+    <div
+        class="status"
+        id="status">
+        GPS stopped
+    </div>
+
+
+    <div class="footer">
+        GPS Speed Meter V3.1 PRO
+    </div>
 
 </div>
 
 
 <script>
 
-/* -------------------------
+/* =========================================
    VARIABLES
-------------------------- */
+========================================= */
 
-let watchID=null;
+let watchID = null;
 
-let running=false;
+let running = false;
 
-let currentSpeed=0;
+let currentSpeed = 0;
 
-let maxSpeed=0;
+let maxSpeed = 0;
 
-let totalDistance=0;
+let totalDistance = 0;
 
-let lastPosition=null;
+let lastGPS = null;
 
-let samples=[];
+let lastGPSTime = null;
 
-let startTime=null;
+let samples = [];
 
-let selectedUnit="kmh";
+let startTime = null;
 
-let speedLimit=80;
+let pausedTime = 0;
 
-let latitude=null;
+let selectedUnit = "kmh";
 
-let longitude=null;
+let speedLimit = 80;
+
+let latitude = null;
+
+let longitude = null;
 
 
-/* -------------------------
-   GAUGE TICKS
-------------------------- */
+/* =========================================
+   CREATE GAUGE TICKS
+========================================= */
 
-const ticks=document.getElementById("ticks");
+const ticks =
+    document.getElementById("ticks");
 
-for(let i=0;i<=16;i++){
 
-    const tick=document.createElement("div");
+for(let i = 0; i <= 32; i++){
 
-    tick.className="tick";
+    const angle =
+        -130 + (i / 32) * 260;
 
-    const angle=-130+(i*16.25);
+    const rad =
+        angle * Math.PI / 180;
 
-    tick.style.transform=
-        "translateX(-50%) rotate("+angle+"deg)";
+    const outerX =
+        200 + Math.sin(rad) * 160;
 
-    ticks.appendChild(tick);
+    const outerY =
+        200 - Math.cos(rad) * 160;
+
+    const innerLength =
+        i % 4 === 0 ? 16 : 9;
+
+    const innerX =
+        200 + Math.sin(rad) * (160-innerLength);
+
+    const innerY =
+        200 - Math.cos(rad) * (160-innerLength);
+
+    const line =
+        document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "line"
+        );
+
+    line.setAttribute(
+        "x1",
+        innerX
+    );
+
+    line.setAttribute(
+        "y1",
+        innerY
+    );
+
+    line.setAttribute(
+        "x2",
+        outerX
+    );
+
+    line.setAttribute(
+        "y2",
+        outerY
+    );
+
+    line.setAttribute(
+        "class",
+        i % 4 === 0
+        ? "tick major"
+        : "tick"
+    );
+
+    ticks.appendChild(line);
 
 }
 
 
-/* -------------------------
+/* =========================================
    DISTANCE
-------------------------- */
+========================================= */
 
 function distanceBetween(
-lat1,lon1,lat2,lon2
+    lat1,
+    lon1,
+    lat2,
+    lon2
 ){
 
-const R=6371;
+    const R = 6371;
 
-const dLat=
-(lat2-lat1)*Math.PI/180;
+    const dLat =
+        (lat2-lat1)
+        * Math.PI / 180;
 
-const dLon=
-(lon2-lon1)*Math.PI/180;
+    const dLon =
+        (lon2-lon1)
+        * Math.PI / 180;
 
-const a=
-Math.sin(dLat/2)**2+
+    const a =
+        Math.sin(dLat/2) *
+        Math.sin(dLat/2)
 
-Math.cos(lat1*Math.PI/180)*
-Math.cos(lat2*Math.PI/180)*
-Math.sin(dLon/2)**2;
+        +
 
-const c=
-2*Math.atan2(
-Math.sqrt(a),
-Math.sqrt(1-a)
-);
+        Math.cos(
+            lat1*Math.PI/180
+        )
 
-return R*c;
+        *
 
-}
+        Math.cos(
+            lat2*Math.PI/180
+        )
 
+        *
 
-/* -------------------------
-   TIME
-------------------------- */
+        Math.sin(dLon/2) *
+        Math.sin(dLon/2);
 
-function formatTime(sec){
+    const c =
+        2 *
+        Math.atan2(
+            Math.sqrt(a),
+            Math.sqrt(1-a)
+        );
 
-sec=Math.floor(sec);
-
-const h=
-Math.floor(sec/3600);
-
-const m=
-Math.floor((sec%3600)/60);
-
-const s=
-sec%60;
-
-return String(h).padStart(2,"0")
-+":"
-+String(m).padStart(2,"0")
-+":"
-+String(s).padStart(2,"0");
+    return R*c;
 
 }
 
 
-/* -------------------------
+/* =========================================
+   FORMAT TIME
+========================================= */
+
+function formatTime(seconds){
+
+    seconds =
+        Math.floor(seconds);
+
+    const h =
+        Math.floor(seconds / 3600);
+
+    const m =
+        Math.floor(
+            (seconds % 3600) / 60
+        );
+
+    const s =
+        seconds % 60;
+
+    return (
+        String(h).padStart(2,"0")
+        + ":"
+        +
+        String(m).padStart(2,"0")
+        + ":"
+        +
+        String(s).padStart(2,"0")
+    );
+
+}
+
+
+/* =========================================
    UNIT
-------------------------- */
+========================================= */
 
 function setUnit(unit){
 
-selectedUnit=unit;
+    selectedUnit = unit;
 
-document.querySelectorAll(".unitBtn")
-.forEach(x=>x.classList.remove("active"));
+    document
+        .querySelectorAll(".unit-btn")
+        .forEach(function(button){
 
-document
-.getElementById(unit+"Btn")
-.classList.add("active");
+            button.classList.remove(
+                "active"
+            );
 
-updateDisplay();
+        });
+
+
+    document
+        .getElementById(
+            unit + "Btn"
+        )
+        .classList.add("active");
+
+
+    updateDisplay();
 
 }
 
 
-/* -------------------------
-   DISPLAY
-------------------------- */
+/* =========================================
+   UPDATE SPEED DISPLAY
+========================================= */
 
 function updateDisplay(){
 
-let value=currentSpeed;
+    let value =
+        currentSpeed;
 
-let text="KM/H";
+    let unit =
+        "KM/H";
 
-if(selectedUnit==="mph"){
 
-value=currentSpeed*0.621371;
+    if(selectedUnit === "mph"){
 
-text="MPH";
+        value =
+            currentSpeed *
+            0.621371;
+
+        unit =
+            "MPH";
+
+    }
+
+
+    if(selectedUnit === "ms"){
+
+        value =
+            currentSpeed / 3.6;
+
+        unit =
+            "M/S";
+
+    }
+
+
+    document
+        .getElementById("speed")
+        .innerText =
+        value.toFixed(1);
+
+
+    document
+        .getElementById("speedUnit")
+        .innerText =
+        unit;
+
+
+    /* ==============================
+       NEEDLE
+    ============================== */
+
+    const gaugeSpeed =
+        Math.max(
+            0,
+            Math.min(
+                currentSpeed,
+                160
+            )
+        );
+
+
+    const angle =
+        -130 +
+        (
+            gaugeSpeed / 160
+        ) * 260;
+
+
+    document
+        .getElementById("needle")
+        .setAttribute(
+            "transform",
+            "rotate("
+            +
+            angle
+            +
+            " 200 200)"
+        );
+
+
+    /* ==============================
+       WARNING
+    ============================== */
+
+    const warning =
+        document.getElementById(
+            "warning"
+        );
+
+
+    if(currentSpeed >= speedLimit){
+
+        warning.style.display =
+            "block";
+
+    }else{
+
+        warning.style.display =
+            "none";
+
+    }
 
 }
 
-if(selectedUnit==="ms"){
 
-value=currentSpeed/3.6;
-
-text="M/S";
-
-}
-
-document.getElementById("speed")
-.innerText=
-value.toFixed(1);
-
-document.getElementById("speedUnit")
-.innerText=text;
-
-
-/* NEEDLE */
-
-let gaugeSpeed=
-Math.min(currentSpeed,160);
-
-let angle=
--130+(gaugeSpeed/160)*260;
-
-document.getElementById("needle")
-.style.transform=
-"translate(-50%,-100%) rotate("+angle+"deg)";
-
-
-/* WARNING */
-
-if(currentSpeed>=speedLimit){
-
-document.getElementById("warning")
-.style.display="block";
-
-}else{
-
-document.getElementById("warning")
-.style.display="none";
-
-}
-
-}
-
-
-/* -------------------------
-   GPS START
-------------------------- */
+/* =========================================
+   START / STOP
+========================================= */
 
 function toggleGPS(){
 
-if(running){
+    if(running){
 
-stopGPS();
+        stopGPS();
 
-}else{
+    }else{
 
-startGPS();
+        startGPS();
+
+    }
 
 }
 
-}
 
+/* =========================================
+   START GPS
+========================================= */
 
 function startGPS(){
 
-if(!navigator.geolocation){
+    if(!navigator.geolocation){
 
-document.getElementById("status")
-.innerText=
-"GPS not supported";
+        document
+            .getElementById("status")
+            .innerText =
+            "GPS not supported";
 
-return;
+        return;
 
-}
-
-running=true;
-
-startTime=Date.now();
-
-document.getElementById("startBtn")
-.innerText="STOP GPS";
-
-document.getElementById("status")
-.innerText=
-"Getting GPS location...";
-
-watchID=
-navigator.geolocation.watchPosition(
-
-positionUpdate,
-
-gpsError,
-
-{
-
-enableHighAccuracy:true,
-
-maximumAge:1000,
-
-timeout:15000
-
-}
-
-);
-
-timer();
-
-}
+    }
 
 
-/* -------------------------
-   GPS UPDATE
-------------------------- */
+    running = true;
 
-function positionUpdate(position){
-
-const c=position.coords;
-
-latitude=c.latitude;
-
-longitude=c.longitude;
+    startTime =
+        startTime || Date.now();
 
 
-/* SPEED */
-
-let speed=c.speed;
-
-if(speed===null || isNaN(speed)){
-
-speed=0;
-
-}else{
-
-speed=speed*3.6;
-
-}
-
-currentSpeed=speed;
+    document
+        .getElementById("startBtn")
+        .innerText =
+        "STOP GPS";
 
 
-/* MAX */
+    document
+        .getElementById("status")
+        .innerText =
+        "Getting GPS location...";
 
-if(speed>maxSpeed){
 
-maxSpeed=speed;
+    watchID =
+        navigator.geolocation.watchPosition(
+
+            handlePosition,
+
+            handleGPSError,
+
+            {
+                enableHighAccuracy:true,
+                maximumAge:1000,
+                timeout:15000
+            }
+
+        );
+
+
+    updateTimer();
 
 }
 
 
-/* AVG */
+/* =========================================
+   GPS POSITION
+========================================= */
 
-if(speed>1){
+function handlePosition(position){
 
-samples.push(speed);
+    const c =
+        position.coords;
 
-}
+    const now =
+        Date.now();
 
 
-/* DISTANCE */
+    latitude =
+        c.latitude;
 
-if(lastPosition){
+    longitude =
+        c.longitude;
 
-const d=
-distanceBetween(
 
-lastPosition.lat,
-lastPosition.lon,
+    let speed = null;
 
-c.latitude,
-c.longitude
 
-);
+    /* ==============================
+       NATIVE GPS SPEED
+    ============================== */
 
-/*
-Ignore GPS jumps
-larger than 200 meters
-between readings.
-*/
+    if(
+        c.speed !== null &&
+        c.speed !== undefined &&
+        !isNaN(c.speed)
+    ){
 
-if(d<0.2){
+        speed =
+            c.speed * 3.6;
 
-totalDistance+=d;
+    }
 
-}
 
-}
+    /* ==============================
+       FALLBACK SPEED
+    ============================== */
 
-lastPosition={
+    let calculatedSpeed = 0;
 
-lat:c.latitude,
-lon:c.longitude
 
-};
+    if(
+        lastGPS !== null &&
+        lastGPSTime !== null
+    ){
 
+        const distance =
+            distanceBetween(
 
-/* UI */
+                lastGPS.lat,
+                lastGPS.lon,
 
-document.getElementById("accuracy")
-.innerText=
-Math.round(c.accuracy)+" m";
+                c.latitude,
+                c.longitude
 
+            );
 
-if(c.heading!==null &&
-!isNaN(c.heading)){
 
-document.getElementById("heading")
-.innerText=
-Math.round(c.heading)+"°";
+        const seconds =
+            (
+                now -
+                lastGPSTime
+            ) / 1000;
 
-}
 
+        if(
+            seconds > 0.5 &&
+            seconds < 20 &&
+            distance < 0.2
+        ){
 
-updateCards();
+            calculatedSpeed =
+                (
+                    distance /
+                    seconds
+                ) * 3600;
 
-updateDisplay();
+        }
 
-document.getElementById("status")
-.innerText=
-"🟢 GPS tracking active";
+    }
 
-}
 
+    /* ==============================
+       CHOOSE BEST SPEED
+    ============================== */
 
-/* -------------------------
-   CARDS
-------------------------- */
+    if(
+        speed !== null &&
+        speed > 0.5
+    ){
 
-function updateCards(){
+        currentSpeed =
+            speed;
 
-document.getElementById("maxSpeed")
-.innerText=
-maxSpeed.toFixed(1)+" km/h";
+    }else{
 
+        currentSpeed =
+            calculatedSpeed;
 
-let avg=0;
+    }
 
-if(samples.length){
 
-avg=
-samples.reduce(
-(a,b)=>a+b,0
-)/samples.length;
+    /* ==============================
+       GPS NOISE FILTER
+    ============================== */
 
-}
+    if(
+        currentSpeed < 0.5
+    ){
 
-document.getElementById("avgSpeed")
-.innerText=
-avg.toFixed(1)+" km/h";
+        currentSpeed = 0;
 
+    }
 
-document.getElementById("distance")
-.innerText=
-totalDistance.toFixed(2)+" km";
 
-}
+    /* ==============================
+       MAX SPEED
+    ============================== */
 
+    if(
+        currentSpeed >
+        maxSpeed
+    ){
 
-/* -------------------------
-   TIMER
-------------------------- */
+        maxSpeed =
+            currentSpeed;
 
-function timer(){
+    }
 
-if(!running)return;
 
-const seconds=
-(startTime)?
-(Date.now()-startTime)/1000:
-0;
+    /* ==============================
+       AVERAGE
+    ============================== */
 
-document.getElementById("tripTime")
-.innerText=
-formatTime(seconds);
+    if(
+        currentSpeed > 1
+    ){
 
-setTimeout(timer,1000);
+        samples.push(
+            currentSpeed
+        );
 
-}
+    }
 
 
-/* -------------------------
-   STOP
-------------------------- */
+    /* ==============================
+       DISTANCE
+    ============================== */
 
-function stopGPS(){
+    if(lastGPS !== null){
 
-if(watchID!==null){
+        const d =
+            distanceBetween(
 
-navigator.geolocation
-.clearWatch(watchID);
+                lastGPS.lat,
+                lastGPS.lon,
 
-watchID=null;
+                c.latitude,
+                c.longitude
 
-}
+            );
 
-running=false;
 
-document.getElementById("startBtn")
-.innerText=
-"START GPS";
+        /*
+        Ignore bad GPS jumps.
 
-document.getElementById("status")
-.innerText=
-"GPS stopped";
-
-}
-
-
-/* -------------------------
-   RESET
-------------------------- */
-
-function resetTrip(){
-
-stopGPS();
-
-currentSpeed=0;
-
-maxSpeed=0;
-
-totalDistance=0;
-
-lastPosition=null;
-
-samples=[];
-
-startTime=null;
-
-latitude=null;
-
-longitude=null;
-
-document.getElementById("speed")
-.innerText="0.0";
-
-document.getElementById("maxSpeed")
-.innerText="0.0 km/h";
-
-document.getElementById("avgSpeed")
-.innerText="0.0 km/h";
-
-document.getElementById("distance")
-.innerText="0.00 km";
-
-document.getElementById("tripTime")
-.innerText="00:00:00";
-
-document.getElementById("accuracy")
-.innerText="-- m";
-
-document.getElementById("heading")
-.innerText="--°";
-
-updateDisplay();
-
-}
-
-
-/* -------------------------
-   SPEED LIMIT
-------------------------- */
-
-function setLimit(){
-
-const value=
-prompt(
-"Enter speed limit in KM/H:",
-speedLimit
-);
-
-if(value===null)return;
-
-const n=parseFloat(value);
-
-if(!isNaN(n) && n>0){
-
-speedLimit=n;
-
-document.getElementById("status")
-.innerText=
-"Speed limit: "+n+" km/h";
-
-updateDisplay();
-
-}
-
-}
-
-
-/* -------------------------
-   MAP
-------------------------- */
-
-function openMap(){
-
-if(latitude===null ||
-longitude===null){
-
-alert(
-"Start GPS first to get your location."
-);
-
-return;
-
-}
-
-const url=
-"https://www.google.com/maps?q="
-+latitude+","+longitude;
-
-window.open(url,"_blank");
-
-}
-
-
-/* -------------------------
-   SAVE TRIP
-------------------------- */
-
-function saveTrip(){
-
-const trip={
-
-date:new Date().toLocaleString(),
-
-maxSpeed:maxSpeed.toFixed(1),
-
-average:samples.length?
-(
-samples.reduce((a,b)=>a+b,0)
-/
-samples.length
-).toFixed(1):"0",
-
-distance:totalDistance.toFixed(2)
-
-};
-
-localStorage.setItem(
-"gpsLastTrip",
-JSON.stringify(trip)
-);
-
-document.getElementById("status")
-.innerText=
-"Trip saved on this device";
-
-}
-
-
-/* -------------------------
-   FULLSCREEN
-------------------------- */
-
-function fullscreen(){
-
-if(!document.fullscreenElement){
-
-document.documentElement
-.requestFullscreen()
-.catch(()=>{});
-
-}else{
-
-document.exitFullscreen();
-
-}
-
-}
-
-
-/* -------------------------
-   THEME
-------------------------- */
-
-function toggleTheme(){
-
-document.body.classList.toggle("light");
-
-}
-
-
-/* -------------------------
-   GPS ERROR
-------------------------- */
-
-function gpsError(error){
-
-let msg="GPS error";
-
-if(error.code===1)
-msg="Location permission denied";
-
-if(error.code===2)
-msg="GPS unavailable";
-
-if(error.code===3)
-msg="GPS timeout";
-
-document.getElementById("status")
-.innerText=msg;
-
-}
-
-
-/* INITIAL */
-
-updateDisplay();
-
-</script>
-
-</body>
-  </html
+        Only acc
